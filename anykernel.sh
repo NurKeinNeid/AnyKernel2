@@ -3,19 +3,15 @@
 
 ## AnyKernel setup
 # EDIFY properties
-kernel.string=DirtyV by bsmitty83 @ xda-developers
+kernel.string=unicornblood-shamu-m
 do.devicecheck=1
-do.initd=1
+do.initd=0
 do.modules=0
 do.cleanup=1
-device.name1=maguro
-device.name2=toro
-device.name3=toroplus
-device.name4=
-device.name5=
+device.name1=shamu
 
 # shell variables
-block=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;
+block=/dev/block/platform/msm_sdcc.1/by-name/boot;
 
 ## end setup
 
@@ -31,12 +27,7 @@ chmod -R 755 $bin;
 mkdir -p $ramdisk $split_img;
 
 OUTFD=/proc/self/fd/$1;
-
-# ui_print <text>
 ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
-
-# contains <string> <substring>
-contains() { test "${1#*$2}" != "$1" && return 0 || return 1; }
 
 # dump boot and extract ramdisk
 dump_boot() {
@@ -71,10 +62,10 @@ write_boot() {
     secondoff=`cat *-secondoff`;
     secondoff="--second_offset $secondoff";
   fi;
-  if [ -f /tmp/anykernel/zImage ]; then
-    kernel=/tmp/anykernel/zImage;
+  if [ -f /tmp/anykernel/zImage-dtb ]; then
+    kernel=/tmp/anykernel/zImage-dtb;
   else
-    kernel=`ls *-zImage`;
+    kernel=`ls *-zImage-dtb`;
     kernel=$split_img/$kernel;
   fi;
   if [ -f /tmp/anykernel/dtb ]; then
@@ -83,8 +74,7 @@ write_boot() {
     dtb=`ls *-dtb`;
     dtb="--dt $split_img/$dtb";
   fi;
-  cd $ramdisk;
-  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking ramdisk failed. Aborting..."; exit 1;
   fi;
@@ -93,12 +83,6 @@ write_boot() {
     ui_print " "; ui_print "Repacking image failed. Aborting..."; exit 1;
   elif [ `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
     ui_print " "; ui_print "New image larger than boot partition. Aborting..."; exit 1;
-  fi;
-  if [ -f "/data/custom_boot_image_patch.sh" ]; then
-    ash /data/custom_boot_image_patch.sh /tmp/anykernel/boot-new.img;
-    if [ $? != 0 ]; then
-      ui_print " "; ui_print "User script execution failed. Aborting..."; exit 1;
-    fi;
   fi;
   dd if=/tmp/anykernel/boot-new.img of=$block;
 }
@@ -206,44 +190,16 @@ patch_fstab() {
 
 ## end methods
 
-
-## AnyKernel permissions
-# set permissions for included files
-chmod -R 755 $ramdisk
-chmod 644 $ramdisk/sbin/media_profiles.xml
-
-
 ## AnyKernel install
 dump_boot;
 
 # begin ramdisk changes
 
-# init.rc
-backup_file init.rc;
-replace_string init.rc "cpuctl cpu,timer_slack" "mount cgroup none /dev/cpuctl cpu" "mount cgroup none /dev/cpuctl cpu,timer_slack";
-append_file init.rc "run-parts" init;
-
-# init.tuna.rc
-backup_file init.tuna.rc;
-insert_line init.tuna.rc "nodiratime barrier=0" after "mount_all /fstab.tuna" "\tmount ext4 /dev/block/platform/omap/omap_hsmmc.0/by-name/userdata /data remount nosuid nodev noatime nodiratime barrier=0";
-append_file init.tuna.rc "dvbootscript" init.tuna;
-
-# init.superuser.rc
-if [ -f init.superuser.rc ]; then
-  backup_file init.superuser.rc;
-  replace_string init.superuser.rc "Superuser su_daemon" "# su daemon" "\n# Superuser su_daemon";
-  prepend_file init.superuser.rc "SuperSU daemonsu" init.superuser;
-else
-  replace_file init.superuser.rc 750 init.superuser.rc;
-  insert_line init.rc "init.superuser.rc" after "on post-fs-data" "    import /init.superuser.rc";
-fi;
-
-# fstab.tuna
-backup_file fstab.tuna;
-patch_fstab fstab.tuna /system ext4 options "nodiratime,barrier=0" "nodev,noatime,nodiratime,barrier=0,data=writeback,noauto_da_alloc,discard";
-patch_fstab fstab.tuna /cache ext4 options "barrier=0,nomblk_io_submit" "nosuid,nodev,noatime,nodiratime,errors=panic,barrier=0,nomblk_io_submit,data=writeback,noauto_da_alloc";
-patch_fstab fstab.tuna /data ext4 options "nomblk_io_submit,data=writeback" "nosuid,nodev,noatime,errors=panic,nomblk_io_submit,data=writeback,noauto_da_alloc";
-append_file fstab.tuna "usbdisk" fstab;
+# init.shamu.rc
+#backup_file init.shamu.rc;
+#replace_section init.shamu.rc "service mpdecision" "disabled" "#service mpdecision /system/bin/mpdecision --avg_comp\n#   class main\n#   user root\n#   group root readproc\n#    writepid /dev/cpuset/system-background/tasks\n#   disabled";
+#replace_string init.shamu.rc "#    verity_load_state" "    verity_load_state" "#    verity_load_state"
+#append_file init.shamu.rc;
 
 # end ramdisk changes
 
