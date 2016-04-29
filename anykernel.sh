@@ -11,7 +11,7 @@ do.cleanup=1
 device.name1=angler
 
 # shell variables
-block=/dev/block/platform/msm_sdcc.1/by-name/boot;
+block=/dev/block/platform/soc.0/f9824900.sdhci/by-name/boot;
 
 ## end setup
 
@@ -68,13 +68,8 @@ write_boot() {
     kernel=`ls *-Image.gz-dtb`;
     kernel=$split_img/$kernel;
   fi;
-  if [ -f /tmp/anykernel/dtb ]; then
-    dtb="--dt /tmp/anykernel/dtb";
-  elif [ -f *-dtb ]; then
-    dtb=`ls *-dtb`;
-    dtb="--dt $split_img/$dtb";
-  fi;
-  $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  cd $ramdisk;
+  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking ramdisk failed. Aborting..."; exit 1;
   fi;
@@ -190,15 +185,33 @@ patch_fstab() {
 
 ## end methods
 
+
+## AnyKernel permissions
+# set permissions for included files
+chmod -R 755 $ramdisk
+chmod 640 $ramdisk/fstab.angler
+#chmod 750 $ramdisk/init.rc
+#chmod 750 $ramdisk/init.angler.rc
+
+# backup then replace fstab and angler.power.rc
+# backup_file fstab.angler;
+# backup_file init.angler.rc;
+# backup_file init.angler.power.rc;
+replace_file fstab.angler $ramdisk/fstab.angler;
+#replace_file init.rc $ramdisk/init.rc;
+#replace_file init.angler.rc $ramdisk/init.angler.rc;
+
+
 ## AnyKernel install
 dump_boot;
 
 # begin ramdisk changes
 
-# init.angler.rc
-#backup_file init.angler.rc;
-#replace_section init.angler.rc "service mpdecision" "disabled" "#service mpdecision /system/bin/mpdecision --avg_comp\n#   class main\n#   user root\n#   group root readproc\n#    writepid /dev/cpuset/system-background/tasks\n#   disabled";
-#replace_string init.angler.rc "#    verity_load_state" "    verity_load_state" "#    verity_load_state"
+# default.prop
+# backup_file default.prop;
+
+# init.rc
+# backup_file init.rc;
 #append_file init.angler.rc;
 
 # end ramdisk changes
