@@ -68,13 +68,8 @@ write_boot() {
     kernel=`ls *-zImage-dtb`;
     kernel=$split_img/$kernel;
   fi;
-  if [ -f /tmp/anykernel/dtb ]; then
-    dtb="--dt /tmp/anykernel/dtb";
-  elif [ -f *-dtb ]; then
-    dtb=`ls *-dtb`;
-    dtb="--dt $split_img/$dtb";
-  fi;
-  $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  cd $ramdisk;
+  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking ramdisk failed. Aborting..."; exit 1;
   fi;
@@ -190,15 +185,33 @@ patch_fstab() {
 
 ## end methods
 
+
+## AnyKernel permissions
+# set permissions for included files
+chmod -R 755 $ramdisk
+chmod 640 $ramdisk/fstab.shamu
+#chmod 750 $ramdisk/init.rc
+#chmod 750 $ramdisk/init.shamu.rc
+
+# backup then replace fstab and shamu.power.rc
+# backup_file fstab.shamu;
+# backup_file init.shamu.rc;
+# backup_file init.shamu.power.rc;
+replace_file fstab.shamu $ramdisk/fstab.shamu;
+#replace_file init.rc $ramdisk/init.rc;
+#replace_file init.shamu.rc $ramdisk/init.shamu.rc;
+
+
 ## AnyKernel install
 dump_boot;
 
 # begin ramdisk changes
 
-# init.shamu.rc
-#backup_file init.shamu.rc;
-#replace_section init.shamu.rc "service mpdecision" "disabled" "#service mpdecision /system/bin/mpdecision --avg_comp\n#   class main\n#   user root\n#   group root readproc\n#    writepid /dev/cpuset/system-background/tasks\n#   disabled";
-#replace_string init.shamu.rc "#    verity_load_state" "    verity_load_state" "#    verity_load_state"
+# default.prop
+# backup_file default.prop;
+
+# init.rc
+# backup_file init.rc;
 #append_file init.shamu.rc;
 
 # end ramdisk changes
