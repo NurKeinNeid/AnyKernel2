@@ -3,12 +3,12 @@
 
 ## AnyKernel setup
 # EDIFY properties
-kernel.string=unicornblood-hammerhead-m
+kernel.string=unicornblood-mako-m
 do.devicecheck=1
 do.initd=0
 do.modules=0
 do.cleanup=1
-device.name1=hammerhead
+device.name1=mako
 
 # shell variables
 block=/dev/block/platform/msm_sdcc.1/by-name/boot;
@@ -62,19 +62,14 @@ write_boot() {
     secondoff=`cat *-secondoff`;
     secondoff="--second_offset $secondoff";
   fi;
-  if [ -f /tmp/anykernel/zImage-dtb ]; then
-    kernel=/tmp/anykernel/zImage-dtb;
+  if [ -f /tmp/anykernel/zImage ]; then
+    kernel=/tmp/anykernel/zImage;
   else
-    kernel=`ls *-zImage-dtb`;
+    kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
-  if [ -f /tmp/anykernel/dtb ]; then
-    dtb="--dt /tmp/anykernel/dtb";
-  elif [ -f *-dtb ]; then
-    dtb=`ls *-dtb`;
-    dtb="--dt $split_img/$dtb";
-  fi;
-  $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  cd $ramdisk;
+  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking ramdisk failed. Aborting..."; exit 1;
   fi;
@@ -190,16 +185,34 @@ patch_fstab() {
 
 ## end methods
 
+
+## AnyKernel permissions
+# set permissions for included files
+chmod -R 755 $ramdisk
+chmod 640 $ramdisk/fstab.mako
+#chmod 750 $ramdisk/init.rc
+#chmod 750 $ramdisk/init.mako.rc
+
+# backup then replace fstab and mako.power.rc
+# backup_file fstab.mako;
+# backup_file init.mako.rc;
+# backup_file init.mako.power.rc;
+replace_file fstab.mako $ramdisk/fstab.mako;
+#replace_file init.rc $ramdisk/init.rc;
+#replace_file init.mako.rc $ramdisk/init.mako.rc;
+
+
 ## AnyKernel install
 dump_boot;
 
 # begin ramdisk changes
 
-# init.hammerhead.rc
-#backup_file init.hammerhead.rc;
-#replace_section init.hammerhead.rc "service mpdecision" "disabled" "#service mpdecision /system/bin/mpdecision --avg_comp\n#   class main\n#   user root\n#   group root readproc\n#    writepid /dev/cpuset/system-background/tasks\n#   disabled";
-#replace_string init.hammerhead.rc "#    verity_load_state" "    verity_load_state" "#    verity_load_state"
-#append_file init.hammerhead.rc;
+# default.prop
+# backup_file default.prop;
+
+# init.rc
+# backup_file init.rc;
+#append_file init.mako.rc;
 
 # end ramdisk changes
 
