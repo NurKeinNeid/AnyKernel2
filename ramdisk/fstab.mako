@@ -1,4 +1,3 @@
-
 # Android fstab file.
 #<src>                                         <mnt_point>  <type>  <mnt_flags and options>  <fs_mgr_flags>
 # The filesystem that contains the filesystem checker binary (typically /system) cannot
@@ -18,4 +17,4 @@
 /dev/block/platform/msm_sdcc.1/by-name/sbl3         /sbl3           emmc    defaults                                                        defaults
 /dev/block/platform/msm_sdcc.1/by-name/tz           /tz             emmc    defaults                                                        defaults
 /dev/block/platform/msm_sdcc.1/by-name/rpm          /rpm            emmc    defaults                                                        defaults
-/dev/block/platform/msm_sdcc.1/by-name/aboot        /aboot          emmc    defaults  
+/dev/block/platform/msm_sdcc.1/by-name/aboot        /aboot          emmc    defaults 
