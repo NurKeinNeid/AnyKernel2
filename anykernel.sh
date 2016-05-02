@@ -9,6 +9,10 @@ do.initd=0
 do.modules=0
 do.cleanup=1
 device.name1=mako
+device.name2=Mako
+device.name3=nexus 4
+device.name4=Nexus 4
+device.name5=
 
 # shell variables
 block=/dev/block/platform/msm_sdcc.1/by-name/boot;
@@ -68,6 +72,12 @@ write_boot() {
     kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
+  if [ -f /tmp/anykernel/dtb ]; then
+    dtb="--dt /tmp/anykernel/dtb";
+  elif [ -f *-dtb ]; then
+    dtb=`ls *-dtb`;
+    dtb="--dt $split_img/$dtb";
+  fi;
   cd $ramdisk;
   find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   if [ $? != 0 ]; then
@@ -90,18 +100,6 @@ replace_string() {
   if [ -z "$(grep "$2" $1)" ]; then
       sed -i "s;${3};${4};" $1;
   fi;
-}
-
-# replace_section <file> <begin search string> <end search string> <replacement string>
-replace_section() {
-  line=`grep -n "$2" $1 | cut -d: -f1`;
-  sed -i "/${2}/,/${3}/d" $1;
-  sed -i "${line}s;^;${4}\n;" $1;
-}
-
-# remove_section <file> <begin search string> <end search string>
-remove_section() {
-  sed -i "/${2}/,/${3}/d" $1;
 }
 
 # insert_line <file> <if search string> <before|after> <line match string> <inserted line>
@@ -167,10 +165,10 @@ replace_file() {
   chmod $2 $1;
 }
 
-# patch_fstab <fstab file> <mount match name> <fs match type> <block|mount|fstype|options|flags> <original string> <replacement string>
+# patch_fstab <fstab file> <mount match name> <fs match type> <block|mount|fstype|options|flags> <if search string> <replacement string>
 patch_fstab() {
   entry=$(grep "$2" $1 | grep "$3");
-  if [ -z "$(echo "$entry" | grep "$6")" ]; then
+  if [ -z "$(echo "$entry" | grep "$5")" ]; then
     case $4 in
       block) part=$(echo "$entry" | awk '{ print $1 }');;
       mount) part=$(echo "$entry" | awk '{ print $2 }');;
@@ -178,7 +176,7 @@ patch_fstab() {
       options) part=$(echo "$entry" | awk '{ print $4 }');;
       flags) part=$(echo "$entry" | awk '{ print $5 }');;
     esac;
-    newentry=$(echo "$entry" | sed "s;${part};${6};");
+    newentry=${entry//$part/$6};
     sed -i "s;${entry};${newentry};" $1;
   fi;
 }
@@ -188,35 +186,53 @@ patch_fstab() {
 
 ## AnyKernel permissions
 # set permissions for included files
-chmod -R 755 $ramdisk
-chmod 640 $ramdisk/fstab.mako
-#chmod 750 $ramdisk/init.rc
+#chmod -R 755 $ramdisk
 #chmod 750 $ramdisk/init.mako.rc
-
-# backup then replace fstab and mako.power.rc
-# backup_file fstab.mako;
-# backup_file init.mako.rc;
-# backup_file init.mako.power.rc;
-replace_file fstab.mako $ramdisk/fstab.mako;
-#replace_file init.rc $ramdisk/init.rc;
-#replace_file init.mako.rc $ramdisk/init.mako.rc;
-
 
 ## AnyKernel install
 dump_boot;
 
+# clean kernel settings apps shared_prefs
+rm -rf /data/data/mobi.cyann.nstools/shared_prefs
+rm -rf /data/data/aperture.ezekeel.gladoscontrol/shared_prefs
+rm -rf /data/data/com.derkernel.tkt/shared_prefs
+rm -rf /data/data/com.franco.kernel/shared_prefs
+rm -rf /data/data/com.liquid.control/shared_prefs
+rm -rf /data/data/com.grarak.kernelauditor/shared_prefs
+rm -rf /data/data/com.af.synapse/databases/*
+
+# clean previous scripts of other kernels
+rm -f /system/etc/init.d/95dimmers
+rm -f /system/etc/init.d/98tweak
+rm -f /system/etc/init.d/99complete
+rm -f /system/etc/init.d/98_startup_script
+rm -f /system/etc/init.d/99_startup_complete
+rm -f /system/etc/init.d/89airtweaks
+rm -f /system/etc/init.d/98airtweaks
+rm -f /system/etc/init.d/98airtweaks
+rm -f /system/etc/init.d/99airtweaks
+rm -f /system/etc/init.d/13overclock
+rm -f /system/etc/init.d/00turtle
+rm -f /system/etc/init.d/00confg
+rm -f /system/etc/init.d/01mpdecision
+rm -f /system/etc/init.d/00ak
+rm -f /system/etc/init.d/*Neo*
+rm -rf /system/bin/*Neo*
+rm -rf /sdcard/neo
+
+# clean modules
+rm -rf /system/lib/modules
+
+# clean system binaries
+rm -rf /system/bin/mpdecision
+rm -rf /system/bin/thermald
+rm -f /system/lib/hw/power.msm8960.so
+rm -f /system/lib/hw/power.mako.so
+
 # begin ramdisk changes
-
-# default.prop
-# backup_file default.prop;
-
-# init.rc
-# backup_file init.rc;
-#append_file init.mako.rc;
-
+#insert_line init.mako.rc "ScripName" after "import init.mako.usb.rc" "import init.ScripName.rc\n";
 # end ramdisk changes
 
 write_boot;
 
 ## end install
-
