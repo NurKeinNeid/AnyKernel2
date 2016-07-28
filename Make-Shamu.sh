@@ -12,7 +12,7 @@ cd && cd Unicornblood
 
 echo -e $YELLOW"Lets build Shamu..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
 
 export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 

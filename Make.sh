@@ -16,7 +16,7 @@ repo sync
 
 echo -e $YELLOW"Lets build Shamu..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
 
 export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 
@@ -36,7 +36,7 @@ cd && cd Unicornblood
 
 echo -e $YELLOW"Lets build Hammerhead..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
 
 export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 
@@ -54,7 +54,7 @@ cd && cd Unicornblood
 
 echo -e $YELLOW"Mako Please..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
 
 export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 
@@ -74,7 +74,7 @@ cd && cd Unicornblood
 
 echo -e $YELLOW"Lets build Bullhead Next..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/aarch64-linux-android-4.9/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/aarch64-linux-android-4.9/bin:$PATH
 
 export ARCH=arm64 && export CROSS_COMPILE=aarch64-linux-android-
 
@@ -94,7 +94,7 @@ cd && cd Unicornblood
 
 echo -e $YELLOW"Lets build Angler..."$ENDCOLOR
 
-export PATH=/home/nobe1976/Unicornblood/prebuilt/aarch64-linux-android-4.9/bin:$PATH
+export PATH=$HOME/Unicornblood/prebuilt/aarch64-linux-android-4.9/bin:$PATH
 
 export ARCH=arm64 && export CROSS_COMPILE=aarch64-linux-android-
 
