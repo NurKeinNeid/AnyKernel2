@@ -190,7 +190,7 @@ patch_fstab() {
 # set permissions for included files
 chmod -R 755 $ramdisk
 chmod 640 $ramdisk/fstab.shamu
-chmod 640 $ramdisk/init.shamu.power.rc
+chmod 750 $ramdisk/init.shamu.power.rc
 
 
 # begin ramdisk changes
