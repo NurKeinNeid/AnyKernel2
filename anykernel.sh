@@ -190,16 +190,13 @@ patch_fstab() {
 # set permissions for included files
 chmod -R 755 $ramdisk
 chmod 640 $ramdisk/fstab.hammerhead
-#chmod 750 $ramdisk/init.rc
-#chmod 750 $ramdisk/init.hammerhead.rc
+chmod 750 $ramdisk/init.hammerhead.power.rc
+chmod 750 $ramdisk/init.hammerhead.rc
 
-# backup then replace fstab and hammerhead.power.rc
-# backup_file fstab.hammerhead;
-# backup_file init.hammerhead.rc;
-# backup_file init.hammerhead.power.rc;
+# Replace fstab and hammerhead.power.rc
 replace_file fstab.hammerhead $ramdisk/fstab.hammerhead;
-#replace_file init.rc $ramdisk/init.rc;
-#replace_file init.hammerhead.rc $ramdisk/init.hammerhead.rc;
+replace_file init.hammerhead.power.rc $ramdisk/init.hammerhead.power.rc;
+replace_file init.hammerhead.rc $ramdisk/init.hammerhead.rc;
 
 
 ## AnyKernel install
