@@ -1,18 +1,14 @@
 #!/bin/bash
 
-#Variables
-#UNICORNBLOOD=./Unicornblood
-#PREBUILT=./Unicornblood/prebuilt
-
 YELLOW="\033[1;33m"
 RED="\033[0;31m"
 ENDCOLOR="\033[0m"
 
-cd && cd Unicornblood
+cd && cd Unicornblood_N
 
 echo -e $YELLOW"Lets build Shamu..."$ENDCOLOR
 
-export PATH=$HOME/Unicornblood/prebuilt/arm-eabi-4.8/bin:$PATH
+export PATH=$HOME/Unicornblood_N/prebuilt/arm-eabi-4.8/bin:$PATH
 
 export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 
@@ -22,11 +18,11 @@ make ARCH=arm CROSS_COMPILE=$CROSS_COMPILE shamu_defconfig
 
 make ARCH=arm CROSS_COMPILE=$CROSS_COMPILE -j16
 
-cd && cd Unicornblood
+cd && cd Unicornblood_N
 
 mv android_kernel_moto_shamu/arch/arm/boot/zImage-dtb AnyKernel2-SHAMU
 cd AnyKernel2-SHAMU
-zip -r9 Unicornblood-SHAMU-$(date +%m%d%Y).zip * -x README Unicornblood-SHAMU-$(date +%m%d%Y).zip
+zip -r9 Unicornblood_N-SHAMU-$(date +%m%d%Y).zip * -x README Unicornblood_N-SHAMU-$(date +%m%d%Y).zip
 
-cd && cd Unicornblood
+cd && cd Unicornblood_N
 
