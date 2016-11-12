@@ -3,19 +3,19 @@
 
 ## AnyKernel setup
 # EDIFY properties
-kernel.string=
+kernel.string=Unicornblood N Kernel
 do.devicecheck=1
 do.initd=0
 do.modules=0
 do.cleanup=1
-device.name1=
-device.name2=
-device.name3=
-device.name4=
+device.name1=hammerhead
+device.name2=Hammerhead
+device.name3=Nexus 5
+device.name4=nexus 5
 device.name5=
 
 # shell variables
-block=;
+block=/dev/block/platform/msm_sdcc.1/by-name/boot;
 
 ## end setup
 
