@@ -3,19 +3,19 @@
 
 ## AnyKernel setup
 # EDIFY properties
-kernel.string=
+kernel.string=Unicornblood N Kernel
 do.devicecheck=1
 do.initd=0
 do.modules=0
 do.cleanup=1
-device.name1=
-device.name2=
-device.name3=
-device.name4=
+device.name1=bullhead
+device.name2=bullhead
+device.name3=Nexus 5x
+device.name4=nexus 5x
 device.name5=
 
 # shell variables
-block=;
+block=/dev/block/platform/msm_sdcc.1/by-name/boot;
 
 ## end setup
 
@@ -71,23 +71,12 @@ write_boot() {
     secondoff=`cat *-secondoff`;
     secondoff="--second_offset $secondoff";
   fi;
-  if [ -f /tmp/anykernel/zImage ]; then
-    kernel=/tmp/anykernel/zImage;
-  elif [ -f /tmp/anykernel/zImage-dtb ]; then
-    kernel=/tmp/anykernel/zImage-dtb;
+  if [ -f /tmp/anykernel/Image.gz-dtb ]; then
+    kernel=/tmp/anykernel/Image.gz-dtb;
   else
-    kernel=`ls *-zImage`;
+    kernel=`ls *-Image.gz-dtb`;
     kernel=$split_img/$kernel;
   fi;
-  if [ -f /tmp/anykernel/dtb ]; then
-    dtb="--dt /tmp/anykernel/dtb";
-  elif [ -f *-dtb ]; then
-    dtb=`ls *-dtb`;
-    dtb="--dt $split_img/$dtb";
-  fi;
-  if [ -f "$bin/mkbootfs" ]; then
-    $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
-  else
     cd $ramdisk;
     find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   fi;
