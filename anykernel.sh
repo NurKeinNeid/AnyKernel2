@@ -241,6 +241,14 @@ dump_boot;
 
 # begin ramdisk changes
 
+# Set permissive on boot - but only if not already permissive
+cmdfile=`ls $split_img/*-cmdline`;
+cmdtmp=`cat $cmdfile`;
+case "$cmdtmp" in
+  *selinux=permissive*) ;;
+  *) rm $cmdfile; echo "androidboot.selinux=permissive $cmdtmp" > $cmdfile;;
+esac;
+
 # end ramdisk changes
 
 write_boot;
