@@ -71,12 +71,23 @@ write_boot() {
     secondoff=`cat *-secondoff`;
     secondoff="--second_offset $secondoff";
   fi;
-  if [ -f /tmp/anykernel/Image.gz-dtb ]; then
+  if [ -f /tmp/anykernel/zImage ]; then
+    kernel=/tmp/anykernel/zImage;
+  elif [ -f /tmp/anykernel/Image.gz-dtb ]; then
     kernel=/tmp/anykernel/Image.gz-dtb;
   else
-    kernel=`ls *-Image.gz-dtb`;
+    kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
+  if [ -f /tmp/anykernel/dtb ]; then
+    dtb="--dt /tmp/anykernel/dtb";
+  elif [ -f *-dtb ]; then
+    dtb=`ls *-dtb`;
+    dtb="--dt $split_img/$dtb";
+  fi;
+  if [ -f "$bin/mkbootfs" ]; then
+    $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  else
     cd $ramdisk;
     find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
   fi;
