@@ -14,7 +14,7 @@ export ARCH=arm && export CROSS_COMPILE=arm-eabi-
 
 cd android_kernel_lge_hammerhead && make clean && make mrproper
 
-make ARCH=arm CROSS_COMPILE=$CROSS_COMPILE hammerhead_defconfig
+make ARCH=arm CROSS_COMPILE=$CROSS_COMPILE unicornblood_deconfig
 
 make ARCH=arm CROSS_COMPILE=$CROSS_COMPILE -j16
 
