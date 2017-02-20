@@ -3,19 +3,19 @@
 
 ## AnyKernel setup
 # EDIFY properties
-kernel.string=
+kernel.string=Unicornblood N Kernel
 do.devicecheck=1
 do.initd=0
 do.modules=0
 do.cleanup=1
-device.name1=
-device.name2=
-device.name3=
-device.name4=
+device.name1=Dragon
+device.name2=dragon
+device.name3=Pixel C
+device.name4=pixel C
 device.name5=
 
 # shell variables
-block=;
+block=/dev/block/platform/700b0600.sdhci/by-name/KERN-A;
 
 ## end setup
 
@@ -73,8 +73,8 @@ write_boot() {
   fi;
   if [ -f /tmp/anykernel/zImage ]; then
     kernel=/tmp/anykernel/zImage;
-  elif [ -f /tmp/anykernel/zImage-dtb ]; then
-    kernel=/tmp/anykernel/zImage-dtb;
+  elif [ -f /tmp/anykernel/Image.fit ]; then
+    kernel=/tmp/anykernel/Image.fit;
   else
     kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
